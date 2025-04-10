@@ -53,19 +53,27 @@ class Utils:
         root.after(2000, root.destroy)
 
 
-def do_the_work(SELECTED_TEXT, root, label):
+def handle_output(result: str) -> None:
+    clipboard.copy(result)
+
+
+def lookup_ai(SELECTED_TEXT: str, root: tk.Tk, label: tk.Label):
     try:
         client = Client()
         response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": PROMPTS["work_friend"].format(
-                source_text=SELECTED_TEXT)}],
+            messages=[
+                {
+                    "role": "user", 
+                    "content": PROMPTS["work_friend"].format(source_text=SELECTED_TEXT)
+                }
+            ],
             web_search=False
         )
-        print(response.choices[0].message.content)
+        result = response.choices[0].message.content
+        handle_output(result=result)
 
-        # Switch to success message
-        Utils.update_to_success(root, label)
+        Utils.update_to_success(root=root, label=label)
 
     except Exception as e:
         root.destroy()
@@ -80,14 +88,14 @@ def main():
 
     print("Clipboard contains text.")
 
-    # Show overlay
+    # overlay
     root, label = Utils.show_top_right_loading()
 
-    # Run GPT call in background
-    thread = threading.Thread(
-        target=do_the_work, args=(SELECTED_TEXT, root, label))
+    # use ai with a seperate thread
+    thread = threading.Thread(target=lookup_ai, args=(SELECTED_TEXT, root, label))
     thread.start()
 
+    # show window after the thread is started
     root.mainloop()
 
 
