@@ -16,15 +16,12 @@ for file in os.listdir("prompts"):
         except Exception as e:
             print(f"Error while reading '{file}': {e}")
 
-print(PROMPTS)
-exit()
-
 class Utils:
     @staticmethod
     def show_error_popup(message: str) -> None:
         root = tk.Tk()
         root.withdraw()
-        messagebox.showerror("Clipboard Error", message)
+        messagebox.showerror("Chat as GPT", message)
         root.destroy()
 
     @staticmethod
