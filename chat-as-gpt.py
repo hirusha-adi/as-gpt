@@ -3,6 +3,7 @@ import clipboard
 import tkinter as tk
 from tkinter import messagebox
 import threading
+import time
 
 
 class Prompts:
@@ -18,35 +19,35 @@ class Utils:
     @staticmethod
     def show_error_popup(message):
         root = tk.Tk()
-        root.withdraw()  # hide the main tkinter window
+        root.withdraw()
         messagebox.showerror("Clipboard Error", message)
         root.destroy()
 
     @staticmethod
-    def show_loading_overlay():
+    def show_top_right_loading():
         root = tk.Tk()
-        root.overrideredirect(True)  # Hide title bar
+        root.overrideredirect(True)
         root.attributes('-topmost', True)
-        root.configure(bg="black")
 
-        # Set dimensions
         width, height = 250, 80
         screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-
-        x = screen_width - width - 20  # 20px padding from right
-        y = 20  # 20px padding from top
-
+        x = screen_width - width - 20
+        y = 20
         root.geometry(f"{width}x{height}+{x}+{y}")
 
-        label = tk.Label(root, text="⏳ Loading...", font=(
-            "Helvetica", 16), fg="white", bg="black")
+        label = tk.Label(root, text="⏳ Loading...", font=("Helvetica", 16),
+                         fg="white", bg="black")
         label.pack(expand=True, fill="both")
 
-        return root
+        return root, label
+
+    @staticmethod
+    def update_to_success(root, label):
+        label.config(text="✅ Success!", bg="green", fg="white")
+        root.after(2000, root.destroy)  # auto-close after 2 seconds
 
 
-def do_the_work(SELECTED_TEXT, loading_overlay):
+def do_the_work(SELECTED_TEXT, root, label):
     try:
         client = Client()
         response = client.chat.completions.create(
@@ -55,33 +56,33 @@ def do_the_work(SELECTED_TEXT, loading_overlay):
                 source_text=SELECTED_TEXT)}],
             web_search=False
         )
-
         print(response.choices[0].message.content)
+
+        # Switch to success message
+        Utils.update_to_success(root, label)
+
     except Exception as e:
+        root.destroy()
         Utils.show_error_popup(f"Error while generating response: {e}")
-    finally:
-        loading_overlay.destroy()  # Close loading screen
 
 
 def main():
-    # get text from clipboard
-    # ----------------------------------------
     SELECTED_TEXT = clipboard.paste().strip()
     if not isinstance(SELECTED_TEXT, str) or not SELECTED_TEXT:
         Utils.show_error_popup("Clipboard does not contain valid text.")
         return
 
-    # documentation: https://github.com/xtekky/gpt4free?tab=readme-ov-file#-text-generation
-    # Show fullscreen overlay
-    loading_overlay = Utils.show_loading_overlay()
+    print("Clipboard contains text.")
 
-    # Run the heavy task in a separate thread to avoid freezing the GUI
+    # Show overlay
+    root, label = Utils.show_top_right_loading()
+
+    # Run GPT call in background
     thread = threading.Thread(
-        target=do_the_work, args=(SELECTED_TEXT, loading_overlay))
+        target=do_the_work, args=(SELECTED_TEXT, root, label))
     thread.start()
 
-    # Start tkinter mainloop to display the overlay
-    loading_overlay.mainloop()
+    root.mainloop()
 
 
 if __name__ == "__main__":
