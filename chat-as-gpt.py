@@ -6,15 +6,33 @@ from tkinter import messagebox
 import threading
 import time
 import os
+import json
 
+
+CONFIG = {
+    "work_directory": "F:\\Documents\\GitHub\\as-gpt",
+    "window_timeout": 3
+}
+print(f"* Loaded config: {CONFIG}")
+
+print("* Loading prompts...")
 PROMPTS: t.Dict[str, str] = {}
-for file in os.listdir("prompts"):
+for file in os.listdir(os.path.join(CONFIG.get("work_directory"), "prompts")):
     if file.endswith(".txt"):
         try:
-            with open(os.path.join("prompts", file), "r") as f:
+            with open(os.path.join(CONFIG.get("work_directory"), "prompts", file), "r") as f:
                 PROMPTS[file.split(".")[0]] = f.read()
         except Exception as e:
             print(f"Error while reading '{file}': {e}")
+
+if len(PROMPTS) == 0:
+    print("! No prompts found.")
+    time.sleep(CONFIG.get("window_timeout"))
+    exit()
+
+print(f"* Loaded {len(PROMPTS)} prompts: {[k for k in PROMPTS.keys()]}")
+
+time.sleep(10)
 
 class Utils:
     @staticmethod
