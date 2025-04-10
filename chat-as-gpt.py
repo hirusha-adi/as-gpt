@@ -34,7 +34,7 @@ time.sleep(10)
 def handle_output(result: str) -> None:
     clipboard.copy(result)
 
-def lookup_ai(SELECTED_TEXT: str):
+def lookup_ai(source_text: str):
     try:
         client = Client()
         response = client.chat.completions.create(
@@ -42,7 +42,7 @@ def lookup_ai(SELECTED_TEXT: str):
             messages=[
                 {
                     "role": "user", 
-                    "content": PROMPTS["work_friend"].format(source_text=SELECTED_TEXT)
+                    "content": PROMPTS["work_friend"].format(source_text=source_text)
                 }
             ],
             web_search=False
@@ -61,7 +61,7 @@ def main():
         return
 
     print(f"* Clipboard contains text: {SELECTED_TEXT}")
-    lookup_ai()
+    lookup_ai(source_text=SELECTED_TEXT)
 
 
 if __name__ == "__main__":
