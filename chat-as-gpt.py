@@ -17,7 +17,7 @@ PROMPTS = {
 
 class Utils:
     @staticmethod
-    def show_error_popup(message):
+    def show_error_popup(message: str) -> None:
         root = tk.Tk()
         root.withdraw()
         messagebox.showerror("Clipboard Error", message)
@@ -29,22 +29,28 @@ class Utils:
         root.overrideredirect(True)
         root.attributes('-topmost', True)
 
+        # place window at top right corner
         width, height = 250, 80
         screen_width = root.winfo_screenwidth()
         x = screen_width - width - 20
         y = 20
         root.geometry(f"{width}x{height}+{x}+{y}")
 
-        label = tk.Label(root, text="⏳ Loading...", font=("Helvetica", 16),
-                         fg="white", bg="black")
+        # text label
+        label = tk.Label(root, text="⏳ Loading...", font=("Helvetica", 16), fg="white", bg="black")
         label.pack(expand=True, fill="both")
 
         return root, label
 
     @staticmethod
-    def update_to_success(root, label):
+    def update_to_success(root: tk.Tk, label: tk.Label):
         label.config(text="✅ Success!", bg="green", fg="white")
-        root.after(2000, root.destroy)  # auto-close after 2 seconds
+        root.after(2000, root.destroy)
+
+    @staticmethod
+    def update_to_error(root: tk.Tk, label: tk.Label):
+        label.config(text="\u274E Error!", bg="red", fg="white")
+        root.after(2000, root.destroy)
 
 
 def do_the_work(SELECTED_TEXT, root, label):
