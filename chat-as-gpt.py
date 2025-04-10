@@ -31,9 +31,6 @@ print(f"* Loaded {len(PROMPTS)} prompts: {[k for k in PROMPTS.keys()]}")
 time.sleep(10)
 
 
-def handle_output(result: str) -> None:
-    clipboard.copy(result)
-
 def lookup_ai(source_text: str):
     try:
         client = Client()
@@ -48,7 +45,8 @@ def lookup_ai(source_text: str):
             web_search=False
         )
         result = response.choices[0].message.content
-        handle_output(result=result)
+        print(f"+ Result: {result}")
+        clipboard.copy(result)
 
     except Exception as e:
         print(f"! Error in `lookup_ai`: {e}")
