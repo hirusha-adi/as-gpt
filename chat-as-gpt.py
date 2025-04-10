@@ -1,19 +1,23 @@
+import typing as t
 from g4f.client import Client
 import clipboard
 import tkinter as tk
 from tkinter import messagebox
 import threading
 import time
+import os
 
+PROMPTS: t.Dict[str, str] = {}
+for file in os.listdir("prompts"):
+    if file.endswith(".txt"):
+        try:
+            with open(os.path.join("prompts", file), "r") as f:
+                PROMPTS[file.split(".")[0]] = f.read()
+        except Exception as e:
+            print(f"Error while reading '{file}': {e}")
 
-class Prompts:
-    work_friend = "You are a helpful assistant that improves the grammar, tone, and flow of user-written messages. Your goal is to make messages sound human, slightly professional, and polished - without removing the original personality or wording too much. Use the user's exact words as much as possible, fixing only what's necessary to improve clarity, correctness, and tone. The end result should still feel like the user wrote it - just cleaner and more natural. Here is the original message. Rewrite it accordingly. Original message: {source_text}"
-
-
-PROMPTS = {
-    "work_friend": Prompts.work_friend
-}
-
+print(PROMPTS)
+exit()
 
 class Utils:
     @staticmethod
