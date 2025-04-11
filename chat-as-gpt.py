@@ -18,6 +18,7 @@ print(r"""
 
 # ────────────── 📦 DEPENDENCIES ──────────────
 import os
+import sys
 import time
 import typing as t
 import clipboard
@@ -95,12 +96,26 @@ def main():
         exit_with_timeout()
     print(f"* Clipboard text: {selected_text}")
 
-    if "work_friend" not in prompts:
-        print("! Required prompt 'work_friend' not found.")
-        return
+    try:
+        print(f"* Arguments: {sys.argv[:]}")
+        prompt_name = sys.argv[1]
+    except IndexError:
+        print("! Error: You must specify the prompt name as the argument.")
+        exit_with_timeout()
+    
+    if prompt_name:
+        if not (prompt_name in prompts):
+            print(f"! Prompt '{prompt_name}' not found. Exiting...")
+            exit_with_timeout()
+        else:
+            print(f"* Using prompt: {prompt_name}")
+    else:
+        print("* Prompt not specified. Using default prompt.")
+        prompt_name = "work_friend"
+            
 
     print("* Building prompt from clipboard content...")
-    formatted_prompt = prompts["work_friend"].format(source_text=selected_text)
+    formatted_prompt = prompts[prompt_name].format(source_text=selected_text)
 
     timeout_function(
         generate_result,
