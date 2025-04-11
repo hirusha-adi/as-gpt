@@ -10,7 +10,7 @@ import typing as t
 import clipboard
 import time
 import os
-from multiprocessing import Process
+import concurrent.futures
 print("* Imported basic dependencies.")
 
 from g4f.client import Client
@@ -44,6 +44,15 @@ def init():
 
     return CONFIG, PROMPTS
 
+def timeout_function(func, args=(), kwargs={}, timeout=3):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func, *args, **kwargs)
+        try:
+            result = future.result(timeout=timeout)
+            return result
+        except concurrent.futures.TimeoutError:
+            print(f"Function timed out after {timeout} seconds.")
+            return None
 
 def generate_result(prompt: str):
     try:
@@ -83,7 +92,9 @@ def main():
 
     print("* Analyzing the text.")
     prompt = PROMPTS.get("work_friend").format(source_text=SELECTED_TEXT)
-    generate_result(prompt=prompt)
+
+    timeout_function(generate_result, args=(prompt,), timeout=3)
+    # generate_result(prompt=prompt)
 
     print("+ Bye Bye!")
 
