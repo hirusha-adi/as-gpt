@@ -1,3 +1,12 @@
+# ────────────── 🔧 CONFIGURATION ──────────────
+CONFIG = {
+    "work_directory": r"D:\Documents\GH\as-gpt",
+    "window_timeout": 3,
+    "ai_timeout": 8,
+    "exit_after_timeout": True
+}
+
+
 # ────────────── ✨ ASCII Header ──────────────
 print(r"""
 ╔═╗┬ ┬┌─┐┌┬┐  ╔═╗┌─┐  ╔═╗╔═╗╔╦╗
@@ -18,14 +27,12 @@ print("* Imported basic dependencies.")
 from g4f.client import Client
 print("* Imported gpt4free.")
 
-# ────────────── 🔧 CONFIGURATION ──────────────
-CONFIG = {
-    "work_directory": r"D:\Documents\GH\as-gpt",
-    "window_timeout": 3,
-    "ai_timeout": 8
-}
 
 # ────────────── 📦 UTILS ──────────────
+def exit_with_timeout():
+    time.sleep(CONFIG["window_timeout"])
+    exit()
+
 def timeout_function(func, args=(), kwargs={}, timeout=3):
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         start_time = time.perf_counter()
@@ -38,7 +45,7 @@ def timeout_function(func, args=(), kwargs={}, timeout=3):
         except concurrent.futures.TimeoutError:
             elapsed = time.perf_counter() - start_time
             print(f"! Timed out after {timeout} seconds (elapsed: {elapsed:.2f} seconds).")
-            return None
+            exit()
 
 def load_prompts(directory: str) -> t.Dict[str, str]:
     print("* Loading prompts...")
@@ -70,6 +77,7 @@ def generate_result(prompt: str):
     except Exception as e:
         print(f"! Error during AI generation: {e}")
 
+
 # ────────────── 🚀 MAIN ──────────────
 def main():
     print("* Initializing...")
@@ -78,14 +86,13 @@ def main():
     prompts = load_prompts(CONFIG["work_directory"])
     if not prompts:
         print("! No prompts found. Exiting...")
-        time.sleep(CONFIG["window_timeout"])
-        return
+        exit_with_timeout()
 
     print("* Reading clipboard...")
     selected_text = clipboard.paste().strip()
     if not selected_text:
         print("! Clipboard does not contain valid text.")
-        return
+        exit_with_timeout()
     print(f"* Clipboard text: {selected_text}")
 
     if "work_friend" not in prompts:
