@@ -21,7 +21,8 @@ def init():
 
     CONFIG = {
         "work_directory": r"D:\Documents\GH\as-gpt",
-        "window_timeout": 3
+        "window_timeout": 3,
+        "ai_timeout": 8
     }
     print(f"* Loaded config: {CONFIG}")
 
@@ -47,11 +48,15 @@ def init():
 def timeout_function(func, args=(), kwargs={}, timeout=3):
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(func, *args, **kwargs)
+        start_time = time.perf_counter()
         try:
             result = future.result(timeout=timeout)
+            elapsed = time.perf_counter() - start_time
+            print(f"* Function completed in {elapsed:.2f} seconds.")
             return result
         except concurrent.futures.TimeoutError:
-            print(f"Function timed out after {timeout} seconds.")
+            elapsed = time.perf_counter() - start_time
+            print(f"! Function timed out after {timeout} seconds (elapsed: {elapsed:.2f} seconds).")
             return None
 
 def generate_result(prompt: str):
@@ -93,8 +98,7 @@ def main():
     print("* Analyzing the text.")
     prompt = PROMPTS.get("work_friend").format(source_text=SELECTED_TEXT)
 
-    timeout_function(generate_result, args=(prompt,), timeout=3)
-    # generate_result(prompt=prompt)
+    timeout_function(generate_result, args=(prompt,), timeout=CONFIG.get("ai_timeout"))
 
     print("+ Bye Bye!")
 
