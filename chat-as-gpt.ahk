@@ -1,3 +1,3 @@
 ^+!a::
-    Run, python "F:\Documents\GitHub\as-gpt\chat-as-gpt.py" 
+    Run, python "D:\Documents\GH\as-gpt\chat-as-gpt.py" 
 return

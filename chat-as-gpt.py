@@ -6,7 +6,7 @@ import os
 
 
 CONFIG = {
-    "work_directory": "F:\\Documents\\GitHub\\as-gpt",
+    "work_directory": r"D:\Documents\GH\as-gpt",
     "window_timeout": 3
 }
 print(f"* Loaded config: {CONFIG}")
