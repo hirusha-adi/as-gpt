@@ -1,8 +1,19 @@
+print(r"""
+╔═╗┬ ┬┌─┐┌┬┐  ╔═╗┌─┐  ╔═╗╔═╗╔╦╗
+║  ├─┤├─┤ │   ╠═╣└─┐  ║ ╦╠═╝ ║ 
+╚═╝┴ ┴┴ ┴ ┴   ╩ ╩└─┘  ╚═╝╩   ╩ 
+        by @hirushaadi
+""")
+
+
 import typing as t
-from g4f.client import Client
 import clipboard
 import time
 import os
+print("* Imported basic dependencies...")
+
+from g4f.client import Client
+print("* Imported gpt4free.")
 
 
 CONFIG = {
@@ -13,13 +24,13 @@ print(f"* Loaded config: {CONFIG}")
 
 print("* Loading prompts...")
 PROMPTS: t.Dict[str, str] = {}
-for file in os.listdir(os.path.join(CONFIG.get("work_directory"), "prompts")):
-    if file.endswith(".txt"):
+for filename in os.listdir(os.path.join(CONFIG.get("work_directory"), "prompts")):
+    if filename.endswith(".txt"):
         try:
-            with open(os.path.join(CONFIG.get("work_directory"), "prompts", file), "r") as f:
-                PROMPTS[file.split(".")[0]] = f.read()
+            with open(os.path.join(CONFIG.get("work_directory"), "prompts", filename), "r") as file:
+                PROMPTS[filename.split(".")[0]] = file.read()
         except Exception as e:
-            print(f"Error while reading '{file}': {e}")
+            print(f"Error while reading '{filename}': {e}")
 
 if len(PROMPTS) == 0:
     print("! No prompts found.")
