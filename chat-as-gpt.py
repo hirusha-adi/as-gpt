@@ -10,7 +10,7 @@ import typing as t
 import clipboard
 import time
 import os
-print("* Imported basic dependencies...")
+print("* Imported basic dependencies.")
 
 from g4f.client import Client
 print("* Imported gpt4free.")
@@ -22,7 +22,7 @@ CONFIG = {
 }
 print(f"* Loaded config: {CONFIG}")
 
-print("* Loading prompts...")
+print("* Loading prompts.")
 PROMPTS: t.Dict[str, str] = {}
 for filename in os.listdir(os.path.join(CONFIG.get("work_directory"), "prompts")):
     if filename.endswith(".txt"):
@@ -39,12 +39,19 @@ if len(PROMPTS) == 0:
 
 print(f"* Loaded {len(PROMPTS)} prompts: {[k for k in PROMPTS.keys()]}")
 
-time.sleep(10)
+time.sleep(2)
 
 
-def lookup_ai(source_text: str):
+# init + config is done.
+# next, the `main()` function will run.
+# ---------------------------------------
+
+
+def generate_result(source_text: str):
     try:
         client = Client()
+        print("* `g4f.client.Client` initialized.")
+        print("* Generating the result - please wait...")
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -56,22 +63,29 @@ def lookup_ai(source_text: str):
             web_search=False
         )
         result = response.choices[0].message.content
-        print(f"+ Result: {result}")
-        clipboard.copy(result)
+        print(f"+ Generated the result: {result}")
+        return result
 
     except Exception as e:
-        print(f"! Error in `lookup_ai`: {e}")
+        print(f"! Error in `generate_result`: {e}")
 
 
 def main():
     SELECTED_TEXT = clipboard.paste().strip()
     if not isinstance(SELECTED_TEXT, str) or not SELECTED_TEXT:
         print(f"! Clipboard does not contain valid text.")
-        return
-
+        exit()
     print(f"* Clipboard contains text: {SELECTED_TEXT}")
-    lookup_ai(source_text=SELECTED_TEXT)
 
+    print("* Analyzing the text.")
+    result = generate_result(source_text=SELECTED_TEXT)
+
+    clipboard.copy(result)
+    print(f"+ Copied the result to clipboard.")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (KeyboardInterrupt, Exception):
+        input("Press [ENTER] to exit.")
+        exit()
